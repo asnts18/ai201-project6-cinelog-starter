@@ -109,3 +109,33 @@ def test_add_to_watchlist_respects_public_flag(app, sample_user, sample_film):
             user_id=sample_user, film_id=sample_film
         ).first()
         assert in_db.public is False
+
+
+# ── Sort order ───────────────────────────────────────────────────────────────
+
+def test_get_watchlist_returns_alphabetical_order(app, sample_user):
+    """
+    get_watchlist() should return films sorted alphabetically by title,
+    regardless of the order they were added in.
+
+    This exercises the Comment 5 design decision (see pr-response.md):
+    unlike get_collection(), which sorts by date_added desc, the watchlist
+    intentionally sorts alphabetically. Without this test, a future change
+    could silently flip the sort order back to date-added and nothing
+    would catch it.
+    """
+    with app.app_context():
+        film_z = Film(title="Zodiac", year=2007, genre="Thriller")
+        film_a = Film(title="Amelie", year=2001, genre="Romance")
+        db.session.add_all([film_z, film_a])
+        db.session.commit()
+
+        # Add "Zodiac" first, "Amelie" second — the opposite of alphabetical
+        # order — to confirm the sort isn't just reflecting insertion order.
+        add_to_watchlist(user_id=sample_user, film_id=film_z.id)
+        add_to_watchlist(user_id=sample_user, film_id=film_a.id)
+
+        watchlist = get_watchlist(sample_user)
+        titles = [f["title"] for f in watchlist]
+
+        assert titles == ["Amelie", "Zodiac"]
