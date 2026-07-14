@@ -85,5 +85,6 @@ Adds a watchlist to CineLog so users can save films they want to watch later, se
 9. `POST /watchlist/<user_id>/add` with a made-up `film_id` — expect `404` (`FilmNotFoundError`).
 
 ### Commit history
-![git log --oneline showing 10 conventional commits with no merge commits](git-log-screenshot.png)
-<!-- Screenshot to be added: run `git log --oneline origin/main..HEAD` and paste a screenshot here before submitting. -->
+`git log --oneline origin/main..HEAD` — 11 commits, all conventional format, no merge commits:
+
+![git log --oneline showing 11 conventional commits with no merge commits](git-log-screenshot.png)
